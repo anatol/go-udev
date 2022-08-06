@@ -26,7 +26,7 @@ const libudevMagic = 0xfeedcafe
 
 type KObjAction string
 
-func (a KObjAction) String() string {
+func (a KObjAction) MatchingString() string {
 	return string(a)
 }
 
@@ -46,16 +46,21 @@ type UEvent struct {
 	Env    map[string]string
 }
 
-func (e UEvent) String() string {
-	rv := fmt.Sprintf("%s@%s\000", e.Action.String(), e.KObj)
-	for k, v := range e.Env {
-		rv += k + "=" + v + "\000"
-	}
-	return rv
-}
+func (e UEvent) ToKernelFormat() []byte {
+	b := bytes.Buffer{}
+	b.WriteString(e.Action.MatchingString())
+	b.WriteString("@")
+	b.WriteString(e.KObj)
+	b.WriteByte(0)
 
-func (e UEvent) Bytes() []byte {
-	return []byte(e.String())
+	for k, v := range e.Env {
+		b.WriteString(k)
+		b.WriteString("=")
+		b.WriteString(v)
+		b.WriteByte(0)
+	}
+
+	return b.Bytes()
 }
 
 func (e UEvent) Equal(e2 UEvent) (bool, error) {

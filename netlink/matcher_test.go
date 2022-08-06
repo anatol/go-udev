@@ -25,7 +25,7 @@ func TestRules(testing *testing.T) {
 		},
 	}
 
-	add := ADD.String()
+	add := ADD.MatchingString()
 	wrongAction := "can't match"
 
 	// When

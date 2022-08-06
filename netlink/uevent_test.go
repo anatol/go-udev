@@ -47,16 +47,16 @@ func TestParseUEvent(testing *testing.T) {
 		},
 	}
 	for _, s := range samples {
-		raw := s.Bytes()
+		raw := s.ToKernelFormat()
 		uevent, err := ParseUEvent(raw)
-		t.FatalfIf(err != nil, "Unable to parse uevent (got: %s)", s.String())
-		t.FatalfIf(uevent == nil, "Uevent can't be nil (with: %s)", s.String())
+		t.FatalfIf(err != nil, "Unable to parse uevent (got: %s)", string(raw))
+		t.FatalfIf(uevent == nil, "Uevent can't be nil (with: %s)", string(raw))
 
 		ok, err := uevent.Equal(s)
 		t.FatalfIf(!ok || err != nil, "Uevent should be equal: bijectivity fail")
 	}
 
-	raw := samples[0].Bytes()
+	raw := samples[0].ToKernelFormat()
 	raw[3] = 0x00 // remove @ to fake rawdata
 
 	uevent, err := ParseUEvent(raw)
